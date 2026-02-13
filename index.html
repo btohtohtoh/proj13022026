@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💌 A Question For You</title>
+  <style>
+    :root{
+      --bg1:#ffd6e8;
+      --bg2:#ffeef6;
+      --ink:#2b2b2b;
+      --pink:#ff4d88;
+      --pink2:#ff77aa;
+      --card:#ffffffcc;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink);
+      background: radial-gradient(circle at 20% 10%, #fff 0%, var(--bg2) 30%, var(--bg1) 100%);
+      overflow:hidden;
+    }
+
+    /* floating hearts */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+    }
+    .heart{
+      position:absolute;
+      width:18px; height:18px;
+      transform:rotate(45deg);
+      opacity:.85;
+      animation: floatUp linear infinite;
+      filter: drop-shadow(0 6px 10px rgba(255,77,136,.25));
+    }
+    .heart::before,.heart::after{
+      content:"";
+      position:absolute;
+      width:18px; height:18px;
+      background:linear-gradient(180deg, var(--pink2), var(--pink));
+      border-radius:50%;
+    }
+    .heart::before{ left:-9px; top:0; }
+    .heart::after{ left:0; top:-9px; }
+    .heart{ background:linear-gradient(180deg, var(--pink2), var(--pink)); }
+
+    @keyframes floatUp{
+      from{ transform: translateY(20vh) rotate(45deg) scale(var(--s)); }
+      to{ transform: translateY(-120vh) rotate(45deg) scale(var(--s)); }
+    }
+
+    .wrap{
+      position:relative;
+      z-index:1;
+      width:min(92vw, 520px);
+    }
+
+    .card{
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:28px;
+      padding:26px 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.12);
+      text-align:center;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.8);
+      border:1px solid rgba(255,255,255,.9);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+
+    .title{
+      margin:18px 0 6px;
+      font-size: clamp(30px, 5vw, 44px);
+      line-height:1.05;
+    }
+    .subtitle{
+      margin:0 0 16px;
+      font-size: 16px;
+      opacity:.85;
+    }
+
+    .note{
+      margin:16px auto 18px;
+      padding:14px 14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.85);
+      border:1px dashed rgba(255,77,136,.45);
+      font-size:15px;
+      line-height:1.45;
+    }
+
+    .question{
+      font-size: clamp(18px, 3.2vw, 22px);
+      font-weight:800;
+      margin: 10px 0 18px;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:8px;
+      position:relative;
+      height:52px;
+    }
+    button{
+      border:0;
+      cursor:pointer;
+      font-weight:800;
+      padding:12px 18px;
+      border-radius:16px;
+      transition: transform .12s ease, filter .12s ease;
+      font-size:16px;
+      user-select:none;
+    }
+    button:active{ transform: scale(.98); }
+    .yes{
+      background:linear-gradient(180deg, #ff77aa, #ff3f7d);
+      color:white;
+      box-shadow: 0 14px 30px rgba(255,63,125,.25);
+    }
+    .yes:hover{ filter: brightness(1.03); transform: translateY(-1px); }
+
+    .no{
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(0,0,0,.06);
+      color:var(--ink);
+      position:relative;
+    }
+    .no:hover{ transform: translateY(-1px); }
+
+    .footer{
+      margin-top:14px;
+      font-size:12px;
+      opacity:.7;
+    }
+
+    /* success screen */
+    .success{
+      display:none;
+      margin-top:16px;
+      padding:16px 14px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+      border:1px solid rgba(255,255,255,.8);
+    }
+    .success h2{
+      margin:0 0 6px;
+      font-size:24px;
+    }
+    .success p{ margin:0; line-height:1.45; }
+
+    /* confetti */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="badge">💌 For the loml and the most beautiful person ever Biong Tong</span></div>
+
+      <h1 class="title">Hi baby 🥰</h1>
+      <p class="subtitle">I know I'm away, and I know this took forever. So instead of just saying sorry like a normal person, I panic-coded you a whole website. Please accept this digital offering of love and chaos.
+      <div class="note" id="note">
+      You're the best thing that's ever happened to me. I miss your smile, I miss your laughter, I wished I could be with you every moment. I catch whiffs of you in the air, and oh, I wish so much to be home with you right now and hold you in my arms again. I want to spend the rest of my life with you, and a million more Valentines together. This is simply our first.
+      </div>
+
+      <div class="question">Will you be my Valentine? 🌹</div>
+
+      <div class="btnRow" id="btnRow">
+        <button class="yes" id="yesBtn">YES!! 💞</button>
+        <button class="no" id="noBtn">no 😢</button>
+      </div>
+
+      <div class="success" id="success">
+        <h2>I love you💘</h2>
+        <p>
+          Thank you for being my Valentine🥰<br/>
+          I can’t wait to celebrate with you.<br/>
+		 Now will you please accept my Google Calendar invite?<br/>
+          <b>(Screenshot this and send it to me 😚)</b>
+        </p>
+      </div>
+
+      <div class="footer">Made with love ✨</div>
+    </div>
+  </div>
+
+  <script>
+    // 1) Floating hearts generator
+    const hearts = document.getElementById("hearts");
+    function makeHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const left = Math.random()*100;
+      const dur = 6 + Math.random()*7;
+      const size = 0.6 + Math.random()*1.4;
+      h.style.left = left + "vw";
+      h.style.bottom = (-10 - Math.random()*40) + "vh";
+      h.style.animationDuration = dur + "s";
+      h.style.setProperty("--s", size);
+      h.style.opacity = (0.4 + Math.random()*0.6).toFixed(2);
+      hearts.appendChild(h);
+      setTimeout(()=>h.remove(), dur*1000);
+    }
+    setInterval(makeHeart, 220);
+    for(let i=0;i<20;i++) setTimeout(makeHeart, i*120);
+
+    // 2) Playful "no" button that runs away (but not impossible)
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const btnRow = document.getElementById("btnRow");
+
+    function dodge(){
+      const rowRect = btnRow.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const maxX = rowRect.width - btnRect.width;
+      const maxY = 0; // keep in row height
+      const x = Math.max(0, Math.random()*maxX);
+      const y = Math.max(0, Math.random()*maxY);
+      noBtn.style.position = "absolute";
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); dodge(); }, {passive:false});
+
+    // 3) Confetti on YES
+    const success = document.getElementById("success");
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let W, H;
+    function resize(){
+      W = canvas.width = window.innerWidth * devicePixelRatio;
+      H = canvas.height = window.innerHeight * devicePixelRatio;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function confettiBurst(){
+      const pieces = Array.from({length: 160}, ()=>({
+        x: W/2 + (Math.random()-0.5)*80*devicePixelRatio,
+        y: H/2 + (Math.random()-0.5)*40*devicePixelRatio,
+        vx: (Math.random()-0.5)*12*devicePixelRatio,
+        vy: (-Math.random()*12-4)*devicePixelRatio,
+        g: (0.25 + Math.random()*0.25)*devicePixelRatio,
+        s: (4 + Math.random()*6)*devicePixelRatio,
+        r: Math.random()*Math.PI
+      }));
+
+      let t = 0;
+      function frame(){
+        t++;
+        ctx.clearRect(0,0,W,H);
+        pieces.forEach(p=>{
+          p.vy += p.g;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.r += 0.12;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.r);
+          // no custom colors: use default fill style cycling
+          ctx.fillStyle = `hsl(${(t*5 + p.x)%360}, 90%, 70%)`;
+          ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s*0.6);
+          ctx.restore();
+        });
+        if(t < 140) requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,W,H);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    yesBtn.addEventListener("click", ()=>{
+      success.style.display = "block";
+      confettiBurst();
+      // make it extra cute: disable buttons after yes
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      yesBtn.style.filter = "grayscale(0.1)";
+      noBtn.style.opacity = 0.4;
+    });
+  </script>
+</body>
+</html>
